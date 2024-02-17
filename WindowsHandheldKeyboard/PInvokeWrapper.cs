@@ -4,7 +4,7 @@ using System.Windows.Interop;
 using Microsoft.Windows.Sdk;
 using WindowsInput.Native;
 
-namespace FullKeyboardWin
+namespace WindowsHandheldKeyboard
 {
     public static class PInvokeWrapper
     {

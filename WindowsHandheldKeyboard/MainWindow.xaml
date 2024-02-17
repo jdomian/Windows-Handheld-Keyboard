@@ -1,0 +1,821 @@
+﻿<Window x:Class="WindowsHandheldKeyboard.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="MainWindow" Height="225" Width="1280" AllowsTransparency="True" WindowStyle="None" Topmost="True" ShowInTaskbar="False" WindowStartupLocation="CenterScreen" Loaded="Window_Loaded" Closed="Window_Closed" MouseDown="Window_MouseDown" ResizeMode="CanResizeWithGrip" Top="0" VerticalAlignment="Top">
+    <Window.Resources>
+        <Style x:Key="RectButton" TargetType="{x:Type Button}">
+            <Setter Property="Foreground" Value="#BFFFFFFF" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Grid Stylus.IsPressAndHoldEnabled="False">
+                            <Viewbox Stretch="Fill">
+                                <Rectangle x:Name="Path" HorizontalAlignment="Center" VerticalAlignment="Center" Fill="#7F3F3F3F" Width="26" Height="26" Margin="2" RadiusX="2" RadiusY="2"/>
+                            </Viewbox>
+                            <ContentPresenter x:Name="MyContentPresenter" Content="{TemplateBinding Content}" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,0,0" />
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="Button.IsPressed" Value="True">
+                                <Setter TargetName="Path" Property="Fill" Value="#7F7F7F7F"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="RectToggleButton" TargetType="{x:Type ToggleButton}">
+            <!--Font Color-->
+            <Setter Property="Foreground" Value="#CCFFFFFF" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ToggleButton}">
+                        <Grid Stylus.IsPressAndHoldEnabled="False">
+                            <Viewbox Stretch="Fill">
+                                <!--Button Color-->
+                                <Rectangle x:Name="Path" HorizontalAlignment="Center" VerticalAlignment="Center" Fill="#E61A1A1A" Width="65" Height="15" Margin="2" RadiusX="2" RadiusY="2" />
+                            </Viewbox>
+                            <!-- Apply padding to the content presenter -->
+                            <Border BorderBrush="Transparent" BorderThickness="2">
+                                <!-- Add transparent border here -->
+                                <ContentPresenter x:Name="MyContentPresenter" Content="{TemplateBinding Content}" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,0,0">
+                                    <ContentPresenter.Resources>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="FontSize" Value="20" />
+                                            <!-- Adjust the font size as needed -->
+                                            <Setter Property="FontWeight" Value="Bold" />
+                                        </Style>
+                                    </ContentPresenter.Resources>
+                                </ContentPresenter>
+                            </Border>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="ToggleButton.IsChecked" Value="True">
+                                <!--Button DOWN color-->
+                                <Setter TargetName="Path" Property="Fill" Value="gray"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="HexToggleButton" TargetType="{x:Type ToggleButton}">
+            <Setter Property="Foreground" Value="#BFFFFFFF" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ToggleButton}">
+                        <Grid Stylus.IsPressAndHoldEnabled="False">
+                            <Viewbox Stretch="Fill">
+                                <Rectangle x:Name="Path" HorizontalAlignment="Center" VerticalAlignment="Center" Fill="#7F3F3F3F" Width="26" Height="28" />
+                            </Viewbox>
+                            <ContentPresenter x:Name="MyContentPresenter" Content="{TemplateBinding Content}" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,0,0" />
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="ToggleButton.IsChecked" Value="True">
+                                <Setter TargetName="Path" Property="Fill" Value="#7F7F7F7F"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+    <Window.Background>
+        <SolidColorBrush Opacity="0" Color="Gray"/>
+    </Window.Background>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="0.2*" />
+            <ColumnDefinition Width="0.6*"/>
+            <ColumnDefinition Width="0.2*" />
+        </Grid.ColumnDefinitions>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="1*" />
+            <RowDefinition Height="1*" />
+            <RowDefinition Height="1*" />
+            <RowDefinition Height="1*" />
+            <RowDefinition Height="1*" />
+            <RowDefinition Height="1*" />
+        </Grid.RowDefinitions>
+        
+        <!-- Makes background little gaps between keys not clickable to prevent file selection behind keyboard through gaps. -->
+        <Border Background="#01FFFFFF" Grid.Row="1" />
+        <Border Background="#01FFFFFF" Grid.Row="2" />
+        <Border Background="#01FFFFFF" Grid.Row="3" />
+        <Border Background="#01FFFFFF" Grid.Row="4" />
+        <Border Background="#01FFFFFF" Grid.Row="5" />
+        
+        
+        <!-- Sound and controls
+        <Grid Grid.Row="0" Margin="0,5,0,15">
+            <Grid.ColumnDefinitions>444444
+                <ColumnDefinition Width="1*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="1*" />
+            </Grid.ColumnDefinitions>
+            <ToggleButton Style="{DynamicResource RectToggleButton}" Grid.Column="16" Content="🔇" Tag="VOLUME_MUTE"/>
+            <ToggleButton Style="{DynamicResource RectToggleButton}" Grid.Column="17" Content="🔉" Tag="VOLUME_DOWN"/>
+            <ToggleButton Style="{DynamicResource RectToggleButton}" Grid.Column="18" Content="🔊" Tag="VOLUME_UP"/>
+            <Button Style="{DynamicResource RectButton}" Grid.Column="20" Content="❌" Click="ButtonClose_Click"/>
+            <Button Style="{DynamicResource RectButton}" Grid.Column="22" Content="🗕" Click="ButtonHide_Click"/>
+        </Grid>
+        -->
+        
+        <!-- LEFT KEYBOARD -->
+        <Grid Grid.Column="0" Grid.Row="1" Margin="0,-10,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <!--<ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />-->
+            </Grid.ColumnDefinitions>
+            <!--<ToggleButton Style="{DynamicResource RectToggleButton}" Grid.Column="0" Content="ESC" Tag="ESCAPE"/>-->
+            <ToggleButton Style="{DynamicResource RectToggleButton}" Grid.Column="0" Content="1 !" Tag="VK_1"/>
+            <ToggleButton Style="{DynamicResource RectToggleButton}" Grid.Column="1" Content="2 @" Tag="VK_2"/>
+            <ToggleButton Style="{DynamicResource RectToggleButton}" Grid.Column="2" Content="3 #" Tag="VK_3"/>
+            <ToggleButton Style="{DynamicResource RectToggleButton}" Grid.Column="3" Content="4 $" Tag="VK_4"/>
+            <ToggleButton Style="{DynamicResource RectToggleButton}" Grid.Column="4" Content="5 %" Tag="VK_5"/>
+            <!--<ToggleButton Style="{DynamicResource RectToggleButton}" Grid.Column="5" Content="6 ^" Tag="VK_6"/>
+            <ToggleButton Style="{DynamicResource RectToggleButton}" Grid.Column="6" Content="7 &amp;" Tag="VK_7"/>
+            <ToggleButton Style="{DynamicResource RectToggleButton}" Grid.Column="7" Content="8 *" Tag="VK_8"/>
+            <ToggleButton Style="{DynamicResource RectToggleButton}" Grid.Column="8" Content="9 (" Tag="VK_9"/>
+            <ToggleButton Style="{DynamicResource RectToggleButton}" Grid.Column="9" Content="0 )" Tag="VK_0"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="11" Content="F1" Tag="F1"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="12" Content="F2" Tag="F2"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="13" Content="F3" Tag="F3"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="14" Content="F4" Tag="F4"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="15" Content="F5" Tag="F5"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="16" Content="F6" Tag="F6"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="17" Content="F7" Tag="F7"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="18" Content="F8" Tag="F8"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="19" Content="F9" Tag="F9"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="20" Content="F10" Tag="F10"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="21" Content="F11" Tag="F11"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="22" Content="F12" Tag="F12"/>-->
+        </Grid>
+        <Grid Grid.Column="0" Grid.Row="2" Margin="0,-10,0,0">
+            <Grid.ColumnDefinitions>
+                <!--<ColumnDefinition Width="1*" />-->
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <!--<ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />-->
+                <!--<ColumnDefinition Width="1*" />-->
+            </Grid.ColumnDefinitions>
+            <!--<ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="1" Content="Caps" Tag="CAPITAL"/>-->
+            <ToggleButton Style="{DynamicResource RectToggleButton}" Grid.Column="0" Content="Q" Tag="VK_Q"/>
+            <ToggleButton Style="{DynamicResource RectToggleButton}" Grid.Column="1" Content="W" Tag="VK_W"/>
+            <ToggleButton Style="{DynamicResource RectToggleButton}" Grid.Column="2" Content="E" Tag="VK_E"/>
+            <ToggleButton Style="{DynamicResource RectToggleButton}" Grid.Column="3" Content="R" Tag="VK_R"/>
+            <ToggleButton Style="{DynamicResource RectToggleButton}" Grid.Column="4" Content="T" Tag="VK_T"/>
+            <!--<ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="5" Content="Y" Tag="VK_Y"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="6" Content="U" Tag="VK_U"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="7" Content="I" Tag="VK_I"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="8" Content="O" Tag="VK_O"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="9" Content="P" Tag="VK_P"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="12" Content="[ {" Tag="OEM_4"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="13" Content="] }" Tag="OEM_6"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="14" Content="\ |" Tag="OEM_5"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="15" Content="- _" Tag="OEM_MINUS"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="16" Content="= +" Tag="OEM_PLUS"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="17" Content="` ~" Tag="OEM_3"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="18" Content="PrtSc" Tag="SNAPSHOT"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="19" Content="ScrLk" Tag="SCROLL"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="20" Content="Pause" Tag="PAUSE"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="21" Content="PgUp" Tag="PRIOR"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="22" Content="Del" Tag="DELETE"/>-->
+        </Grid>
+        <Grid Grid.Column="0" Grid.Row="3" Margin="0,-10,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <!--<ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />-->
+                <ColumnDefinition Width="1*" />
+            </Grid.ColumnDefinitions>
+            <!--<ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="0" Content="Shift" Tag="LSHIFT"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="1" Content="Alt" Tag="LMENU"/>-->
+            <ToggleButton Style="{DynamicResource RectToggleButton}" Grid.Column="1" Content="A" Tag="VK_A"/>
+            <ToggleButton Style="{DynamicResource RectToggleButton}" Grid.Column="2" Content="S" Tag="VK_S"/>
+            <ToggleButton Style="{DynamicResource RectToggleButton}" Grid.Column="3" Content="D" Tag="VK_D"/>
+            <ToggleButton Style="{DynamicResource RectToggleButton}" Grid.Column="4" Content="F" Tag="VK_F"/>
+            <ToggleButton Style="{DynamicResource RectToggleButton}" Grid.Column="5" Content="G" Tag="VK_G"/>
+            <!--<ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="7" Content="H" Tag="VK_H"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="8" Content="J" Tag="VK_J"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="9" Content="K" Tag="VK_K"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="10" Content="L" Tag="VK_L"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="11" Content="; :" Tag="OEM_1"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="12" Content="' &quot;" Tag="OEM_7"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="13" Content=", &lt;" Tag="OEM_COMMA"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="14" Content=". &gt;" Tag="OEM_PERIOD"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="15" Content="/ ?" Tag="OEM_2"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="16" Content="Shift" Tag="RSHIFT"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="17" Content="Ins" Tag="INSERT"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="18" Content="Home" Tag="HOME"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="19" Content="↑" Tag="UP"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="20" Content="End" Tag="END"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="21" Content="PgDn" Tag="NEXT"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="22" Content="⌫" Tag="BACK"/>-->
+        </Grid>
+        <Grid Grid.Column="0" Grid.Row="4" Margin="0,-10,0,5">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <!--<ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="1*" />-->
+            </Grid.ColumnDefinitions>
+            <!--<ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="1" Content="↹" Tag="TAB"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="2" Content="Ctrl" Tag="LCONTROL"/>-->
+            <!--<ToggleButton Style="{DynamicResource RectToggleButton}" Grid.Column="0" Content="⥣" Tag="CAPITAL"/>-->
+            <ToggleButton Style="{DynamicResource RectToggleButton}" Grid.Column="0" Content="Shift" Tag="LSHIFT"/>
+            <ToggleButton Style="{DynamicResource RectToggleButton}" Grid.Column="1" Content="Z" Tag="VK_Z"/>
+            <ToggleButton Style="{DynamicResource RectToggleButton}" Grid.Column="2" Content="X" Tag="VK_X"/>
+            <ToggleButton Style="{DynamicResource RectToggleButton}" Grid.Column="3" Content="C" Tag="VK_C"/>
+            <ToggleButton Style="{DynamicResource RectToggleButton}" Grid.Column="4" Content="V" Tag="VK_V"/>
+            <!--<ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="7" Content="B" Tag="VK_B"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="8" Content="N" Tag="VK_N"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="9" Content="M" Tag="VK_M"/>
+            <ToggleButton Style="{DynamicResource RectToggleButton}" Grid.Column="10" Grid.ColumnSpan="4" Margin="0,10,0,2" Content=" " Tag="SPACE"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="14" Content="Alt" Tag="RMENU"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="15" Content="⊞" Tag="LWIN"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="16" Content="⊞" Tag="RWIN"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="17" Content="▤" Tag="APPS"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="18" Content="Ctrl" Tag="RCONTROL"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="19" Content="←" Tag="LEFT"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="20" Content="↓" Tag="DOWN"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="21" Content="→" Tag="RIGHT"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="22" Content="⏎" Tag="RETURN"/>-->
+        </Grid>
+        <Grid Grid.Column="0" Grid.Row="5" Margin="0,-10,0,5">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <!--<ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="1*" />-->
+            </Grid.ColumnDefinitions>
+            <!--<ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="1" Content="↹" Tag="TAB"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="2" Content="Ctrl" Tag="LCONTROL"/>
+            <ToggleButton Style="{DynamicResource RectToggleButton}" Grid.Column="0" Content="Shift" Tag="LSHIFT"/>
+            <ToggleButton Style="{DynamicResource RectToggleButton}" Grid.Column="1" Content="Z" Tag="VK_Z"/>
+            <ToggleButton Style="{DynamicResource RectToggleButton}" Grid.Column="2" Content="X" Tag="VK_X"/>
+            <ToggleButton Style="{DynamicResource RectToggleButton}" Grid.Column="3" Content="C" Tag="VK_C"/>
+            <ToggleButton Style="{DynamicResource RectToggleButton}" Grid.Column="4" Content="V" Tag="VK_V"/>
+            ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="7" Content="B" Tag="VK_B"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="8" Content="N" Tag="VK_N"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="9" Content="M" Tag="VK_M"/>-->
+            <ToggleButton Style="{DynamicResource RectToggleButton}" Grid.Column="0" Content="⊞" Tag="LWIN"/>
+            <ToggleButton Style="{DynamicResource RectToggleButton}" Grid.Column="1" Grid.ColumnSpan="4" Margin="-10,0,-20,0" Content=" " Tag="SPACE"/>
+            <!--<<ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="14" Content="Alt" Tag="RMENU"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="15" Content="⊞" Tag="LWIN"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="16" Content="⊞" Tag="RWIN"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="17" Content="▤" Tag="APPS"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="18" Content="Ctrl" Tag="RCONTROL"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="19" Content="←" Tag="LEFT"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="20" Content="↓" Tag="DOWN"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="21" Content="→" Tag="RIGHT"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="22" Content="⏎" Tag="RETURN"/>-->
+        </Grid>
+        
+        
+        
+        
+        <!-- RIGHT KEYBOARD-->
+        <Grid Grid.Column="2" Grid.Row="0" Margin="0,-10,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+            </Grid.ColumnDefinitions>
+            <ToggleButton Style="{DynamicResource RectToggleButton}" Grid.Column="0" Content="🔇" Tag="VOLUME_MUTE"/>
+            <ToggleButton Style="{DynamicResource RectToggleButton}" Grid.Column="1" Content="🔉" Tag="VOLUME_DOWN"/>
+            <ToggleButton Style="{DynamicResource RectToggleButton}" Grid.Column="2" Content="🔊" Tag="VOLUME_UP"/>
+            <Button Style="{DynamicResource RectButton}" Grid.Column="3" Content="🗕" Click="ButtonHide_Click"/>
+            <Button Style="{DynamicResource RectButton}" Grid.Column="4" Content="❌" Click="ButtonClose_Click"/>
+        </Grid>
+        <Grid Grid.Column="2" Grid.Row="1" Margin="0,-10,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <!--<ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />-->
+            </Grid.ColumnDefinitions>
+            <!--<ToggleButton Style="{DynamicResource RectToggleButton}" Grid.Column="0" Content="ESC" Tag="ESCAPE"/>-->
+            <!--<ToggleButton Style="{DynamicResource RectToggleButton}" Grid.Column="0" Content="1 !" Tag="VK_1"/>
+            <ToggleButton Style="{DynamicResource RectToggleButton}" Grid.Column="1" Content="2 @" Tag="VK_2"/>
+            <ToggleButton Style="{DynamicResource RectToggleButton}" Grid.Column="2" Content="3 #" Tag="VK_3"/>
+            <ToggleButton Style="{DynamicResource RectToggleButton}" Grid.Column="3" Content="4 $" Tag="VK_4"/>
+            <ToggleButton Style="{DynamicResource RectToggleButton}" Grid.Column="4" Content="5 %" Tag="VK_5"/>-->
+            <ToggleButton Style="{DynamicResource RectToggleButton}" Grid.Column="0" Content="6 ^" Tag="VK_6"/>
+            <ToggleButton Style="{DynamicResource RectToggleButton}" Grid.Column="1" Content="7 &amp;" Tag="VK_7"/>
+            <ToggleButton Style="{DynamicResource RectToggleButton}" Grid.Column="2" Content="8 *" Tag="VK_8"/>
+            <ToggleButton Style="{DynamicResource RectToggleButton}" Grid.Column="3" Content="9 (" Tag="VK_9"/>
+            <ToggleButton Style="{DynamicResource RectToggleButton}" Grid.Column="4" Content="0 )" Tag="VK_0"/>
+            <!--<ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="11" Content="F1" Tag="F1"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="12" Content="F2" Tag="F2"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="13" Content="F3" Tag="F3"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="14" Content="F4" Tag="F4"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="15" Content="F5" Tag="F5"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="16" Content="F6" Tag="F6"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="17" Content="F7" Tag="F7"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="18" Content="F8" Tag="F8"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="19" Content="F9" Tag="F9"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="20" Content="F10" Tag="F10"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="21" Content="F11" Tag="F11"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="22" Content="F12" Tag="F12"/>-->
+        </Grid>
+        <Grid Grid.Column="2" Grid.Row="2" Margin="0,-10,0,0">
+            <Grid.ColumnDefinitions>
+                <!--<ColumnDefinition Width="1*" />-->
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <!--<ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />-->
+                <!--<ColumnDefinition Width="1*" />-->
+            </Grid.ColumnDefinitions>
+            <!--<ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="1" Content="Caps" Tag="CAPITAL"/>-->
+            <!--<ToggleButton Style="{DynamicResource RectToggleButton}" Grid.Column="0" Content="Q" Tag="VK_Q"/>
+            <ToggleButton Style="{DynamicResource RectToggleButton}" Grid.Column="1" Content="W" Tag="VK_W"/>
+            <ToggleButton Style="{DynamicResource RectToggleButton}" Grid.Column="2" Content="E" Tag="VK_E"/>
+            <ToggleButton Style="{DynamicResource RectToggleButton}" Grid.Column="3" Content="R" Tag="VK_R"/>
+            <ToggleButton Style="{DynamicResource RectToggleButton}" Grid.Column="4" Content="T" Tag="VK_T"/>-->
+            <ToggleButton Style="{DynamicResource RectToggleButton}" Grid.Column="0" Content="Y" Tag="VK_Y"/>
+            <ToggleButton Style="{DynamicResource RectToggleButton}" Grid.Column="1" Content="U" Tag="VK_U"/>
+            <ToggleButton Style="{DynamicResource RectToggleButton}" Grid.Column="2" Content="I" Tag="VK_I"/>
+            <ToggleButton Style="{DynamicResource RectToggleButton}" Grid.Column="3" Content="O" Tag="VK_O"/>
+            <ToggleButton Style="{DynamicResource RectToggleButton}" Grid.Column="4" Content="P" Tag="VK_P"/>
+            <!--<ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="12" Content="[ {" Tag="OEM_4"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="13" Content="] }" Tag="OEM_6"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="14" Content="\ |" Tag="OEM_5"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="15" Content="- _" Tag="OEM_MINUS"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="16" Content="= +" Tag="OEM_PLUS"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="17" Content="` ~" Tag="OEM_3"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="18" Content="PrtSc" Tag="SNAPSHOT"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="19" Content="ScrLk" Tag="SCROLL"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="20" Content="Pause" Tag="PAUSE"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="21" Content="PgUp" Tag="PRIOR"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="22" Content="Del" Tag="DELETE"/>-->
+        </Grid>
+        <Grid Grid.Column="2" Grid.Row="3" Margin="0,-10,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <!--<ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />-->
+                <ColumnDefinition Width="1*" />
+            </Grid.ColumnDefinitions>
+            <!--<ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="0" Content="Shift" Tag="LSHIFT"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="1" Content="Alt" Tag="LMENU"/>-->
+            <!--<ToggleButton Style="{DynamicResource RectToggleButton}" Grid.Column="1" Content="A" Tag="VK_A"/>
+            <ToggleButton Style="{DynamicResource RectToggleButton}" Grid.Column="1" Content="S" Tag="VK_S"/>
+            <ToggleButton Style="{DynamicResource RectToggleButton}" Grid.Column="2" Content="D" Tag="VK_D"/>
+            <ToggleButton Style="{DynamicResource RectToggleButton}" Grid.Column="3" Content="F" Tag="VK_F"/>-->
+            <ToggleButton Style="{DynamicResource RectToggleButton}" Grid.Column="1" Content="G" Tag="VK_G"/>
+            <ToggleButton Style="{DynamicResource RectToggleButton}" Grid.Column="2" Content="H" Tag="VK_H"/>
+            <ToggleButton Style="{DynamicResource RectToggleButton}" Grid.Column="3" Content="J" Tag="VK_J"/>
+            <ToggleButton Style="{DynamicResource RectToggleButton}" Grid.Column="4" Content="K" Tag="VK_K"/>
+            <ToggleButton Style="{DynamicResource RectToggleButton}" Grid.Column="5" Content="L" Tag="VK_L"/>
+            <!--<ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="11" Content="; :" Tag="OEM_1"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="12" Content="' &quot;" Tag="OEM_7"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="13" Content=", &lt;" Tag="OEM_COMMA"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="14" Content=". &gt;" Tag="OEM_PERIOD"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="15" Content="/ ?" Tag="OEM_2"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="16" Content="Shift" Tag="RSHIFT"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="17" Content="Ins" Tag="INSERT"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="18" Content="Home" Tag="HOME"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="19" Content="↑" Tag="UP"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="20" Content="End" Tag="END"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="21" Content="PgDn" Tag="NEXT"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="22" Content="⌫" Tag="BACK"/>-->
+        </Grid>
+        <Grid Grid.Column="2" Grid.Row="4" Margin="0,-10,0,5">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <!--<ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="1*" />-->
+            </Grid.ColumnDefinitions>
+            <!--<ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="1" Content="↹" Tag="TAB"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="2" Content="Ctrl" Tag="LCONTROL"/>
+            <ToggleButton Style="{DynamicResource RectToggleButton}" Grid.Column="0" Content="Shift" Tag="LSHIFT"/>
+            <ToggleButton Style="{DynamicResource RectToggleButton}" Grid.Column="0" Content="⥣" Tag="CAPITAL"/>
+            <ToggleButton Style="{DynamicResource RectToggleButton}" Grid.Column="0" Content="Z" Tag="VK_Z"/>
+            <ToggleButton Style="{DynamicResource RectToggleButton}" Grid.Column="1" Content="X" Tag="VK_X"/>
+            <ToggleButton Style="{DynamicResource RectToggleButton}" Grid.Column="2" Content="C" Tag="VK_C"/>-->
+            <ToggleButton Style="{DynamicResource RectToggleButton}" Grid.Column="0" Content="V" Tag="VK_V"/>
+            <ToggleButton Style="{DynamicResource RectToggleButton}" Grid.Column="1" Content="B" Tag="VK_B"/>
+            <ToggleButton Style="{DynamicResource RectToggleButton}" Grid.Column="2" Content="N" Tag="VK_N"/>
+            <ToggleButton Style="{DynamicResource RectToggleButton}" Grid.Column="3" Content="M" Tag="VK_M"/>
+            <ToggleButton Style="{DynamicResource RectToggleButton}" Grid.Column="4" Content="⌫" Tag="BACK"/>
+            <!--<ToggleButton Style="{DynamicResource RectToggleButton}" Grid.Column="10" Grid.ColumnSpan="4" Margin="0,10,0,2" Content=" " Tag="SPACE"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="14" Content="Alt" Tag="RMENU"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="15" Content="⊞" Tag="LWIN"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="16" Content="⊞" Tag="RWIN"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="17" Content="▤" Tag="APPS"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="18" Content="Ctrl" Tag="RCONTROL"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="19" Content="←" Tag="LEFT"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="20" Content="↓" Tag="DOWN"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="21" Content="→" Tag="RIGHT"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="22" Content="⏎" Tag="RETURN"/>-->
+        </Grid>
+        <Grid Grid.Column="2" Grid.Row="5" Margin="0,-10,0,5">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <!--<ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="1*" />-->
+            </Grid.ColumnDefinitions>
+            <!--<ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="1" Content="↹" Tag="TAB"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="2" Content="Ctrl" Tag="LCONTROL"/>
+            <ToggleButton Style="{DynamicResource RectToggleButton}" Grid.Column="0" Content="Shift" Tag="LSHIFT"/>
+            <ToggleButton Style="{DynamicResource RectToggleButton}" Grid.Column="1" Content="Z" Tag="VK_Z"/>
+            <ToggleButton Style="{DynamicResource RectToggleButton}" Grid.Column="2" Content="X" Tag="VK_X"/>
+            <ToggleButton Style="{DynamicResource RectToggleButton}" Grid.Column="3" Content="C" Tag="VK_C"/>
+            <ToggleButton Style="{DynamicResource RectToggleButton}" Grid.Column="4" Content="V" Tag="VK_V"/>
+            ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="7" Content="B" Tag="VK_B"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="8" Content="N" Tag="VK_N"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="9" Content="M" Tag="VK_M"/>
+            <ToggleButton Style="{DynamicResource RectToggleButton}" Grid.Column="0" Content="⊞" Tag="LWIN"/>-->
+            <ToggleButton Style="{DynamicResource RectToggleButton}" Grid.Column="0" Grid.ColumnSpan="4" Margin="-10,0,-20,0" Content=" " Tag="SPACE"/>
+            <ToggleButton Style="{DynamicResource RectToggleButton}" Grid.Column="4" Content=". &gt;" Tag="OEM_PERIOD"/>
+            <!--<<ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="14" Content="Alt" Tag="RMENU"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="15" Content="⊞" Tag="LWIN"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="16" Content="⊞" Tag="RWIN"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="17" Content="▤" Tag="APPS"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="18" Content="Ctrl" Tag="RCONTROL"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="19" Content="←" Tag="LEFT"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="20" Content="↓" Tag="DOWN"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="21" Content="→" Tag="RIGHT"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="22" Content="⏎" Tag="RETURN"/>-->
+        </Grid>
+        
+        
+        
+        
+        
+        
+        
+        <!-- ORIGINAL
+        <Grid Grid.Column="2" Grid.Row="2" Margin="0,-10,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="1*" />
+            </Grid.ColumnDefinitions>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="1" Content="Caps" Tag="CAPITAL"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="2" Content="Q" Tag="VK_Q"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="3" Content="W" Tag="VK_W"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="4" Content="E" Tag="VK_E"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="5" Content="R" Tag="VK_R"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="6" Content="T" Tag="VK_T"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="7" Content="Y" Tag="VK_Y"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="8" Content="U" Tag="VK_U"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="9" Content="I" Tag="VK_I"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="10" Content="O" Tag="VK_O"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="11" Content="P" Tag="VK_P"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="12" Content="[ {" Tag="OEM_4"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="13" Content="] }" Tag="OEM_6"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="14" Content="\ |" Tag="OEM_5"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="15" Content="- _" Tag="OEM_MINUS"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="16" Content="= +" Tag="OEM_PLUS"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="17" Content="` ~" Tag="OEM_3"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="18" Content="PrtSc" Tag="SNAPSHOT"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="19" Content="ScrLk" Tag="SCROLL"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="20" Content="Pause" Tag="PAUSE"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="21" Content="PgUp" Tag="PRIOR"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="22" Content="Del" Tag="DELETE"/>
+        </Grid>
+        <Grid Grid.Column="2" Grid.Row="3" Margin="0,-10,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+            </Grid.ColumnDefinitions>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="0" Content="Shift" Tag="LSHIFT"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="1" Content="Alt" Tag="LMENU"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="2" Content="A" Tag="VK_A"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="3" Content="S" Tag="VK_S"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="4" Content="D" Tag="VK_D"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="5" Content="F" Tag="VK_F"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="6" Content="G" Tag="VK_G"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="7" Content="H" Tag="VK_H"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="8" Content="J" Tag="VK_J"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="9" Content="K" Tag="VK_K"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="10" Content="L" Tag="VK_L"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="11" Content="; :" Tag="OEM_1"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="12" Content="' &quot;" Tag="OEM_7"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="13" Content=", &lt;" Tag="OEM_COMMA"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="14" Content=". &gt;" Tag="OEM_PERIOD"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="15" Content="/ ?" Tag="OEM_2"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="16" Content="Shift" Tag="RSHIFT"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="17" Content="Ins" Tag="INSERT"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="18" Content="Home" Tag="HOME"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="19" Content="↑" Tag="UP"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="20" Content="End" Tag="END"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="21" Content="PgDn" Tag="NEXT"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="22" Content="⌫" Tag="BACK"/>
+        </Grid>
+        <Grid Grid.Column="2" Grid.Row="4" Margin="0,-10,0,5">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="1*" />
+            </Grid.ColumnDefinitions>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="1" Content="↹" Tag="TAB"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="2" Content="Ctrl" Tag="LCONTROL"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="3" Content="Z" Tag="VK_Z"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="4" Content="X" Tag="VK_X"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="5" Content="C" Tag="VK_C"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="6" Content="V" Tag="VK_V"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="7" Content="B" Tag="VK_B"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="8" Content="N" Tag="VK_N"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="9" Content="M" Tag="VK_M"/>
+            <ToggleButton Style="{DynamicResource RectToggleButton}" Grid.Column="10" Grid.ColumnSpan="4" Margin="0,10,0,2" Content=" " Tag="SPACE"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="14" Content="Alt" Tag="RMENU"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="15" Content="⊞" Tag="LWIN"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="16" Content="⊞" Tag="RWIN"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="17" Content="▤" Tag="APPS"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="18" Content="Ctrl" Tag="RCONTROL"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="19" Content="←" Tag="LEFT"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="20" Content="↓" Tag="DOWN"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="21" Content="→" Tag="RIGHT"/>
+            <ToggleButton Style="{DynamicResource HexToggleButton}" Grid.Column="22" Content="⏎" Tag="RETURN"/>
+        </Grid>
+         -->
+    </Grid>
+</Window>

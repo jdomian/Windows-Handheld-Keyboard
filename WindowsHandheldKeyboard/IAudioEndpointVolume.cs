@@ -2,7 +2,7 @@
 using System.Data;
 using System.Runtime.InteropServices;
 
-namespace FullKeyboardWin
+namespace WindowsHandheldKeyboard
 {
     // https://stackoverflow.com/questions/52663135/windows-10-get-system-audio-mute-status-in-c-sharp
 

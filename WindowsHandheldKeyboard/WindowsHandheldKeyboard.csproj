@@ -1,9 +1,9 @@
 ﻿<Project>
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net45</TargetFramework>
+    <TargetFramework>net481</TargetFramework>
 	<UseWpf>true</UseWpf>
-	<StartupObject>FullKeyboardWin.Program</StartupObject>
+	<StartupObject>WindowsHandheldKeyboard.Program</StartupObject>
     <IncludePackageReferencesDuringMarkupCompilation>true</IncludePackageReferencesDuringMarkupCompilation>
     <ApplicationIcon>Icon.ico</ApplicationIcon>
     <BaseIntermediateOutputPath>..\Obj\$(MSBuildProjectName)</BaseIntermediateOutputPath>

@@ -7,8 +7,9 @@ using System.Windows.Interop;
 using WindowsInput;
 using WindowsInput.Native;
 using System.Windows.Controls.Primitives;
+using System.Diagnostics;
 
-namespace FullKeyboardWin
+namespace WindowsHandheldKeyboard
 {
     public partial class MainWindow : Window
     {
@@ -29,11 +30,11 @@ namespace FullKeyboardWin
             var desktopWorkingArea = SystemParameters.WorkArea;
             if (desktopWorkingArea.Width > 0)
             {
-                var Height = Math.Min(this.Height / this.Width * desktopWorkingArea.Width, desktopWorkingArea.Height / 2);
+                var Height = Math.Min(this.Height / this.Width * desktopWorkingArea.Width, desktopWorkingArea.Height);
                 this.Width = desktopWorkingArea.Width;
                 this.Height = Height;
                 this.Left = 0;
-                this.Top = desktopWorkingArea.Bottom - Height;
+                this.Top = desktopWorkingArea.Height * 0.15; //15% from top
             }
             else
             {
@@ -45,11 +46,18 @@ namespace FullKeyboardWin
             PInvokeWrapper.SetWindowNoFocus(helper.Handle);
             hwndSource = HwndSource.FromHwnd(helper.Handle);
 
+            //Kills explorer.exe and restarts it to free up Win+Ctrl+Shift+O
+            System.Diagnostics.Process.Start("taskkill", "/f /im explorer.exe");
+            System.Threading.Thread.Sleep(1000);
+
             //Win+Ctrl+O is taken by explorer.exe, but we can workaround by killing explorer.exe and registering before restarting it
             PInvokeWrapper.TryRegisterHotKey(hwndSource, 9000, PInvokeWrapper.ModifierCode.MOD_WIN | PInvokeWrapper.ModifierCode.MOD_CONTROL, VirtualKeyCode.VK_O, () =>
             {
                 this.Visibility = this.IsVisible ? Visibility.Hidden : Visibility.Visible;
             });
+
+            //Restarts explorer.exe
+            System.Diagnostics.Process.Start("explorer.exe");
 
             PInvokeWrapper.TryRegisterHotKey(hwndSource, 9001, PInvokeWrapper.ModifierCode.MOD_WIN | PInvokeWrapper.ModifierCode.MOD_SHIFT, VirtualKeyCode.VK_O, () =>
             {
@@ -59,9 +67,77 @@ namespace FullKeyboardWin
             notifyIcon = new System.Windows.Forms.NotifyIcon();
             notifyIcon.Click += (s, e) =>
             {
-                this.Visibility = this.IsVisible ? Visibility.Hidden : Visibility.Visible;
+                // Check if the left mouse button is clicked
+                if (e is System.Windows.Forms.MouseEventArgs mouseEventArgs && mouseEventArgs.Button == System.Windows.Forms.MouseButtons.Left)
+                {
+                    this.Visibility = this.IsVisible ? Visibility.Hidden : Visibility.Visible;
+                }
             };
             notifyIcon.Icon = System.Drawing.Icon.ExtractAssociatedIcon(System.Reflection.Assembly.GetExecutingAssembly().Location);
+
+            // Add context menu
+            System.Windows.Forms.ContextMenuStrip contextMenu = new System.Windows.Forms.ContextMenuStrip();
+            
+            // Adds menu item for showing/hiding the keyboard
+            System.Windows.Forms.ToolStripMenuItem menuItem = new System.Windows.Forms.ToolStripMenuItem("Show/Hide (Win+Ctrl+O)");
+            menuItem.Click += (menuItemSender, clickEventArgs) =>
+            {
+                this.Visibility = this.IsVisible ? Visibility.Hidden : Visibility.Visible;
+            };
+            contextMenu.Items.Add(menuItem);
+
+            // Add menu item for increasing keyboard position upwards
+            System.Windows.Forms.ToolStripMenuItem increasePositionUpMenuItem = new System.Windows.Forms.ToolStripMenuItem("Increase Position Upwards");
+            increasePositionUpMenuItem.Click += (menuItemSender, clickEventArgs) =>
+            {
+                // Increase keyboard position upwards by 10% of the screen height
+                double screenHeight = SystemParameters.WorkArea.Height;
+                double increment = 0.1 * screenHeight;
+                this.Top -= increment;
+            };
+
+            // Add menu item for decreasing keyboard position downwards
+            System.Windows.Forms.ToolStripMenuItem decreasePositionDownMenuItem = new System.Windows.Forms.ToolStripMenuItem("Decrease Position Downwards");
+            decreasePositionDownMenuItem.Click += (menuItemSender, clickEventArgs) =>
+            {
+                // Decrease keyboard position downwards by 10% of the screen height
+                double screenHeight = SystemParameters.WorkArea.Height;
+                double increment = 0.1 * screenHeight;
+                this.Top += increment;
+            };
+
+            // Add "Quit Keyboard" menu item
+            System.Windows.Forms.ToolStripMenuItem quitMenuItem = new System.Windows.Forms.ToolStripMenuItem("Quit Keyboard");
+            quitMenuItem.Click += (menuItemSender, clickEventArgs) =>
+            {
+                // Close the keyboard window and exit the application
+                this.Close();
+                System.Windows.Application.Current.Shutdown();
+            };
+
+            // Add a separator line
+            contextMenu.Items.Add(new System.Windows.Forms.ToolStripSeparator());
+
+            // Add "Exit" menu item
+            System.Windows.Forms.ToolStripMenuItem exitMenuItem = new System.Windows.Forms.ToolStripMenuItem("Exit");
+            exitMenuItem.Click += (menuItemSender, clickEventArgs) =>
+            {
+                // Exit the application
+                System.Windows.Application.Current.Shutdown();
+            };
+
+            // Add the menu items to the context menu
+            
+            
+            contextMenu.Items.Add(increasePositionUpMenuItem);
+            contextMenu.Items.Add(decreasePositionDownMenuItem);
+            contextMenu.Items.Add(new System.Windows.Forms.ToolStripSeparator());
+            contextMenu.Items.Add(quitMenuItem);
+            contextMenu.Items.Add(new System.Windows.Forms.ToolStripSeparator());
+            contextMenu.Items.Add(exitMenuItem);
+
+            notifyIcon.ContextMenuStrip = contextMenu;
+
             notifyIcon.Visible = true;
 
             var modifierKeys = new HashSet<VirtualKeyCode> { VirtualKeyCode.LCONTROL, VirtualKeyCode.RCONTROL, VirtualKeyCode.LSHIFT, VirtualKeyCode.RSHIFT, VirtualKeyCode.LMENU, VirtualKeyCode.RMENU, VirtualKeyCode.LWIN, VirtualKeyCode.RWIN };
@@ -239,8 +315,21 @@ namespace FullKeyboardWin
 
         private void ButtonClose_Click(object sender, RoutedEventArgs e)
         {
-            this.Close();
+            // Start the process to terminate explorer.exe
+            Process process = Process.Start("taskkill", "/f /im explorer.exe");
+            if (process != null)
+            {
+                // Wait for the process to exit
+                process.WaitForExit();
+
+                // Start explorer.exe again
+                Process.Start("explorer.exe");
+
+                // Close the current application
+                this.Close();
+            }
         }
+
         private void ButtonHide_Click(object sender, RoutedEventArgs e)
         {
             this.Visibility = Visibility.Hidden;

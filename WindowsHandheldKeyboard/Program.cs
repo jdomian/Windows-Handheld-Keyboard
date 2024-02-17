@@ -4,7 +4,7 @@ using System.Threading;
 using System.Windows;
 using System.Windows.Threading;
 
-namespace FullKeyboardWin
+namespace WindowsHandheldKeyboard
 {
     public class Program
     {
