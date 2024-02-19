@@ -34,7 +34,7 @@ namespace WindowsHandheldKeyboard
                 this.Width = desktopWorkingArea.Width;
                 this.Height = Height;
                 this.Left = 0;
-                this.Top = desktopWorkingArea.Height * 0.15; //15% from top
+                this.Top = desktopWorkingArea.Height * 0.075; //7.5% from top
             }
             else
             {
